@@ -1,3 +1,4 @@
 
+from macaroons_lib import Macaroon
 
-a = Macaroons()
+a = Macaroon()

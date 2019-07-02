@@ -8,8 +8,6 @@ import hmac
 import hashlib
 import base64
 import time
-import json 
-	
-from Crypto.Cipher import AES    ## https://techtutorialsx.com/2018/04/09/python-pycrypto-using-aes-128-in-ecb-mode/
-conda install pycrypto
+import json 	
+from Crypto.Cipher import AES    ## pip install pycrypto      https://techtutorialsx.com/2018/04/09/python-pycrypto-using-aes-128-in-ecb-mode/
 

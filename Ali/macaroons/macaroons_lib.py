@@ -3,6 +3,7 @@ import hashlib
 import base64
 import time
 from Crypto.Cipher import AES
+import json 
 
 """
 key: encryption key
@@ -45,7 +46,6 @@ def verify(macaroon, K_TargetService ):
         vId = caveat['vid']
         sig_prime =  hmac.new(signature_str, caveat['vid']+caveat['cid'] , hashlib.sha256)
         signature_str = sig_prime.hexdigest()
-    
     if(signature_str != macaroon.sig):
         return false #### incorrect 
     else: 
@@ -59,7 +59,6 @@ class Macaroon(object):
         #### 
         self.targetLocation = None
         self.thirdPartyLocations = [] 
-
     def addCaveatHelper(self, cId, vId, caveat_location):
         ### KLUDGE: "pattern matching" in the addCaveatHelper
         caveat = {'cid': cId, 'vid': vId, 'clocation':caveat_location }
@@ -67,21 +66,67 @@ class Macaroon(object):
         self.caveats.append(caveat)
         self.sig = sig_prime.hexdigest()
         return self  
-
     def addThirdPartyCaveat(self, cK, cId, cL):
         vId = ENC(self.sig, cK)
         self.thirdPartyLocations.append(cL)
         self.addCaveatHelper(cId, vId, cL)
-    
     def addFirstPartyCaveat(self, a):
         self.addCaveatHelper(a, 0, self.targetLocation )
-    
     def prepareForRequest(self):
         pass
-    
 
-        
+"""
+ Reference is https://www.w3schools.com/python/python_json.asp 
+ https://medium.com/python-pandemonium/json-the-python-way-91aac95d4041
+"""
+def marshalToJSON(macaroon):
+    json_string = json.dumps(macaroon, default=convert_to_dict)
+    return json_string 
 
+def parseFromJSON(json_string):
+    macaroon_object = json.loads(json_string, object_hook=dict_to_obj)
+    return macaroon_object 
+
+def convert_to_dict(mac_obj):
+    dictionary = { 
+                 "id": mac_obj.id, 
+                "sig": mac_obj.sig, 
+                "targetLocation":mac_obj.targetLocation,
+                "thirdPartyLocations": mac_obj.thirdPartyLocations
+    }
+    #### caveat = {'cid': cId, 'vid': vId, 'clocation':caveat_location }
+    caveatsString = "--"
+    for caveat in mac_obj.caveats:
+        caveatsString+="-"
+        caveatsString+= caveat['cid']
+        caveatsString+=","
+        caveatsString+= caveat['vid']
+        caveatsString+=","
+        caveatsString+= caveat['clocation']
+        caveatsString+="-"
+    caveatsString += "-"
+    dictionary['caveats']  = caveatsString
+    obj_dict = {
+    "__class__": mac_obj.__class__.__name__,
+    "__module__": mac_obj.__module__
+    }
+    obj_dict.update(mac_obj.__dict__)
+    return obj_dict
+
+def dict_to_obj(dictionary_obj):
+    print("---", str(dictionary_obj))
+    caveatsList = []
+    caveatsString = dictionary_obj['caveats']
+    caveatsArrWithoutProcessing = caveatsString.split("--")
+    for caveatString in caveatsArrWithoutProcessing:
+        if(caveatString == ''):
+            continue 
+        subCaveatArr = caveatString.split(",")
+        caveatsList.append({'cid' :  subCaveatArr[0], 'vid': subCaveatArr[1],  'clocation' :subCaveatArr[2] })
+    macaroon_object = Macaroon(dictionary_obj["id"] , caveatsList , dictionary_obj['sig'] )
+    macaroon_object.targetLocation = dictionary_obj["targetLocation"]
+    macaroon_object.thirdPartyLocations = dictionary_obj["thirdPartyLocations"]
+    return macaroon_object
 
 
 ##

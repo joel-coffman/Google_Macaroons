@@ -5,6 +5,8 @@ import time
 import hmac
 import hashlib
 import base64
+import macaroons_lib2 as mlib
+
 ##########
 ##########
 ##########
@@ -12,7 +14,7 @@ import base64
 
 # https://pynative.com/python-generate-random-string/
 alphabet = [x for x in string.lowercase]
-allAlphabet = arr + [x.upper() for x in arr]
+allAlphabet = alphabet + [x.upper() for x in alphabet]
 
 
 ##########
@@ -41,6 +43,7 @@ def hmac_sha_256(arr):
     payload = arr[0]
     key = arr[1]
     hexVal =  hmac.new(key, payload , hashlib.sha256).hexdigest()
+    #print('here', hexVal)
     return hexVal
 
 def timingModule(func, inputs ,numRuns =10000):
@@ -52,6 +55,13 @@ def timingModule(func, inputs ,numRuns =10000):
     return (outputs, startTime, endTime)
 #### Generate 300 , 500, and  700 bytes of data 
 
+def mint_macaroon(arr):
+    public_id = arr[0]
+    private_key = arr[1]
+    location = arr[2]
+    #### use library to compute HMAC
+    M = mlib.CreateMacaroon(key, public_id, location)
+    
 
 def BENCHMARK_HMAC_SHA_256(numRuns, sizePayload, randomKeySizeBits=128):
     randomKey = generateStringOfBytes(int(randomKeySizeBits/8))
@@ -65,12 +75,15 @@ def BENCHMARK_HMAC_SHA_256(numRuns, sizePayload, randomKeySizeBits=128):
     print("BENCHMARK_HMAC_SHA_256: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
 
+def BENCHMARK_MINT_MACAROON(numRuns, sizePayload , randomKeySizeBits=128):
+    randomKey = generateStringOfBytes(int(randomKeySizeBits/8))
+    payloads = generatePayloads(numRuns, sizePayload)
 
 ###########################
 ### Experiment 1: 300 bytes
-###########################
+##########import macaroons_lib2 as mlib#################
 numberOfRuns = 1000
 BYTES_SIZE = 300
-result = BENCHMARK_HMAC_SHA_256(numRuns, BYTES_SIZE, randomKeySizeBits=128)
+result = BENCHMARK_HMAC_SHA_256(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
  
-    
+

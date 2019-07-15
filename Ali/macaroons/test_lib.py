@@ -53,7 +53,7 @@ def test1_CreateMacaroon():
     printTestResult("CreateMacaroon" , "SUCCESS")
 
 """
-    This function tests... 
+    This function tests... addCaveatHelper
 """
 def test2_addCaveatHelper():
     printTestDesc("addCaveatHelper")
@@ -78,13 +78,16 @@ def test2_addCaveatHelper():
     assert(M.sig == new_sig.hexdigest())
     printTestResult("addCaveatHelper" , "SUCCESS")
 
-
-
-def test2_CreateMacaroon():
+"""
+    This function tests... addFirstPartyCaveat  --> this function wraps add caveat helper
+"""
+def test2_addFirstPartyCaveat():
     id = ""
     key = ""
     location = ""
     macaroon = mlib.createMacaroon()
+
+
 
 
 

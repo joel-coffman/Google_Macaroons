@@ -1,17 +1,20 @@
-import hmac
-import hashlib
+
+# import hashlib
 import base64
 import time
 from Crypto.Cipher import AES
 import json 
+from cryptography.hazmat.primitives import hashes, hmac
+from cryptography.hazmat.backends import default_backend  ### https://github.com/pyca/cryptography/blob/master/docs/hazmat/primitives/mac/hmac.rst
 
 """
 key: encryption key
 id: random_nonce / payload
 """
 def CreateMacaroon(key, id, location):
-    data = hmac.new(key, id, hashlib.sha256)
-    signature_str = data.hexdigest()  # KLUDGE: can we go back and forth from hexdigest()
+    data = hmac.HMAC(key, hashes.SHA256(), backend=default_backend())
+    data.update(id)
+    signature_str = data.finalize()
     macaroon_obj = Macaroon( id , [], signature_str)
     macaroon_obj.targetLocation = location 
     return macaroon_obj
@@ -38,64 +41,47 @@ def ENC(sig, key):
 """
 def verify(macaroon, K_TargetService ):
     #### verify the K_TargetService with Random_Nonce
-    data = hmac.new(K_TargetService, macaroon.id, hashlib.sha256)
-    signature_str = data.hexdigest() 
+    data = hmac.HMAC(K_TargetService, hashes.SHA256(), backend=default_backend())
+    data.update(macaroon.id)
+    signature_str = data.finalize()
+
     #### verify the caveats 
     for caveat in macaroon.caveats:
         cId = caveat['cid']
         vId = caveat['vid']
-        sig_prime =  hmac.new(signature_str, caveat['vid']+caveat['cid'] , hashlib.sha256)
-        signature_str = sig_prime.hexdigest()
+        data2 = hmac.HMAC(signature_str, hashes.SHA256(), backend=default_backend())
+        data2.update(caveat['vid']+caveat['cid'])
+        signature_str = data2.finalize()
     if(signature_str != macaroon.sig):
         return false #### incorrect 
     else: 
         return true #### verified to be correct 
 
 class Macaroon(object):
-
-    """
-        id = string
-        caveatsList = [str1, str2...]
-        signature = string
-    """
     def __init__(self, id, caveatsList, signature):
-        caveatsList = [str(x) for x in caveatsList]
-        signature = str(signature)
-        id = str(id)
+        caveatsList = [unicode(x) for x in caveatsList]
+        signature = unicode(signature)
+        id = unicode(id)
         self.caveats = caveatsList
         self.id = id
         self.sig = signature 
         #### 
         self.targetLocation = None
         self.thirdPartyLocations = [] 
-    """
-        cId = string
-        vId = string
-        caveat_location = string 
-    """
     def addCaveatHelper(self, cId, vId, caveat_location):
         ### KLUDGE: "pattern matching" in the addCaveatHelper
-        typeCaveat = type(caveat_location)
-        caveat =  str(cId) +":" + str(vId) + ":" + str(caveat_location)
-        #print("self.sig ", self.sig, "  and type is: ", type(self.sig))
-        sig_prime =  hmac.new( str(self.sig), str(vId)+str(cId) , hashlib.sha256)
+        caveat =  cId +":" + vId + ":" + caveat_location  
+        data = hmac.HMAC(self.sig, hashes.SHA256(), backend=default_backend())
+        data.update(vId+cId)
         self.caveats.append(caveat)
-        self.sig = sig_prime.hexdigest()
+        self.sig = data.finalize()
         return self  
-    """
-        cK = string
-        cId = string
-        cL = string 
-    """
     def addThirdPartyCaveat(self, cK, cId, cL):
         vId = ENC(self.sig, cK)
         self.thirdPartyLocations.append(cL)
         self.addCaveatHelper(cId, vId, cL)
-    """
-        a = string 
-    """
     def addFirstPartyCaveat(self, a):
-        self.addCaveatHelper(a, '0', self.targetLocation )
+        self.addCaveatHelper(a, 0, self.targetLocation )
     def prepareForRequest(self):
         pass
 

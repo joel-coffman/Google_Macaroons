@@ -42,14 +42,17 @@ def verify(macaroon, K_TargetService ):
     signature_str = data.hexdigest() 
     #### verify the caveats 
     for caveat in macaroon.caveats:
-        cId = caveat['cid']
-        vId = caveat['vid']
-        sig_prime =  hmac.new(signature_str, caveat['vid']+caveat['cid'] , hashlib.sha256)
+        #print(type(caveat))
+        #print(caveat)
+        caveatArr = caveat.split(':')
+        cId = caveatArr[0] # str(caveat['cid'])
+        vId = caveatArr[1] #str(caveat['vid'])
+        sig_prime =  hmac.new(signature_str, str(vId)+str(cId) , hashlib.sha256)
         signature_str = sig_prime.hexdigest()
     if(signature_str != macaroon.sig):
-        return false #### incorrect 
+        return False #### incorrect 
     else: 
-        return true #### verified to be correct 
+        return True #### verified to be correct 
 
 class Macaroon(object):
 

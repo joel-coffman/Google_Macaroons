@@ -76,6 +76,12 @@ def add_caveat(arr):
         macaroon.addFirstPartyCaveat(caveat_string)
     return macaroon
 
+def verify_macaroon(arr):
+    macaroon = arr[0] 
+    K_TargetService = arr[1]
+    assert(mlib.verify(macaroon, K_TargetService ) == True)
+    return macaroon
+
 a= []
 
 def BENCHMARK_HMAC_SHA_256(numRuns, sizePayload, randomKeySizeBits=128):
@@ -104,7 +110,7 @@ def BENCHMARK_MINT_MACAROON(numRuns, sizePayload , randomKeySizeBits=128):
     print(endTime)
     diff = diff * 1000000.
     print("BENCHMARK_MINT_MACAROON: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
-    return outputs
+    return outputs, randomKey
 
 """
 caveats_to_copy is a list of strings, so you could have caveats_to_copy =[string1, string2, string3]
@@ -123,6 +129,19 @@ def BENCHMARK_ADD_CAVEAT(list_macaroons, caveats_to_copy):
     print("BENCHMARK_ADD_CAVEAT: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
 
+def BENCHMARK_VERIFY(list_macaroons, randomKey):
+    numRuns = len(list_macaroons)
+    listRandomKeys  = [randomKey for x in range(numRuns)]
+    data_inputs = []
+    for index in range(numRuns):
+        data_inputs.append([list_macaroons[index], listRandomKeys[index]])
+    (outputs, startTime, endTime) = timingModule(verify_macaroon, data_inputs, numRuns = numRuns)
+    diff = (endTime - startTime+.0)/numRuns
+    print(startTime)
+    print(endTime)
+    diff = diff * 1000000.
+    print("BENCHMARK_VERIFY: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
+    return outputs
 
 
 ###########################
@@ -132,5 +151,6 @@ numberOfRuns = 1000
 BYTES_SIZE = 300
 
 result = BENCHMARK_HMAC_SHA_256(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
-macaroons_ = BENCHMARK_MINT_MACAROON(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
+(macaroons_, randomKey) = BENCHMARK_MINT_MACAROON(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 macaroons_with_caveats_added = BENCHMARK_ADD_CAVEAT(macaroons_, caveats_to_copy=["chunk E 100 ... 500", "op E read, write", "time < 5/1/13 3pm"])
+macaroons_verified=BENCHMARK_VERIFY(macaroons_with_caveats_added, randomKey)

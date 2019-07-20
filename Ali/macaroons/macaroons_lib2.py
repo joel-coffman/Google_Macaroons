@@ -6,7 +6,7 @@ from Crypto.Cipher import AES
 import json 
 
 """
-key: encryption key
+key: encryption key   
 id: random_nonce / payload
 """
 def CreateMacaroon(key, id, location):

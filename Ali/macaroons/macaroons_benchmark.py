@@ -93,8 +93,8 @@ def BENCHMARK_HMAC_SHA_256(numRuns, sizePayload, randomKeySizeBits=128):
     data_inputs = [[payload , randomKey] for payload in payloads]
     (outputs, startTime, endTime) = timingModule(hmac_sha_256,data_inputs, numRuns = numRuns)
     diff = (endTime - startTime+.0)/numRuns
-    print(startTime)
-    print(endTime)
+    #print(startTime)
+    #print(endTime)
     diff = diff * 1000000.
     print("BENCHMARK_HMAC_SHA_256: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
@@ -106,8 +106,8 @@ def BENCHMARK_MINT_MACAROON(numRuns, sizePayload , randomKeySizeBits=128):
     data_inputs = [[payload , randomKey, "MY LOCATION"] for payload in payloads]
     (outputs, startTime, endTime) = timingModule(mint_macaroon, data_inputs, numRuns = numRuns)
     diff = (endTime - startTime+.0)/numRuns
-    print(startTime)
-    print(endTime)
+    #print(startTime)
+    #print(endTime)
     diff = diff * 1000000.
     print("BENCHMARK_MINT_MACAROON: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs, randomKey
@@ -123,8 +123,8 @@ def BENCHMARK_ADD_CAVEAT(list_macaroons, caveats_to_copy):
         data_inputs.append([list_macaroons[index], list_caveats[index]])
     (outputs, startTime, endTime) = timingModule(add_caveat, data_inputs, numRuns = numRuns)
     diff = (endTime - startTime+.0)/numRuns
-    print(startTime)
-    print(endTime)
+    #print(startTime)
+    #print(endTime)
     diff = diff * 1000000.
     print("BENCHMARK_ADD_CAVEAT: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
@@ -137,8 +137,8 @@ def BENCHMARK_VERIFY(list_macaroons, randomKey):
         data_inputs.append([list_macaroons[index], listRandomKeys[index]])
     (outputs, startTime, endTime) = timingModule(verify_macaroon, data_inputs, numRuns = numRuns)
     diff = (endTime - startTime+.0)/numRuns
-    print(startTime)
-    print(endTime)
+    #print(startTime)
+    #print(endTime)
     diff = diff * 1000000.
     print("BENCHMARK_VERIFY: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
@@ -148,8 +148,8 @@ def BENCHMARK_MARSHALL_JSON(list_macaroons):
     data_inputs = list_macaroons
     (outputs, startTime, endTime) = timingModule(  mlib.marshalToJSON , data_inputs, numRuns = numRuns)
     diff = (endTime - startTime+.0)/numRuns
-    print(startTime)
-    print(endTime)
+    #print(startTime)
+    #print(endTime)
     diff = diff * 1000000.
     print("BENCHMARK_MARSHALL_JSON: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
@@ -160,8 +160,8 @@ def BENCHMARK_PARSE_JSON(list_macaroons_strings):
     data_inputs = list_macaroons_strings
     (outputs, startTime, endTime) = timingModule(  mlib.parseFromJSON , data_inputs, numRuns = numRuns)
     diff = (endTime - startTime+.0)/numRuns
-    print(startTime)
-    print(endTime)
+    #print(startTime)
+    #print(endTime)
     diff = diff * 1000000.
     print("BENCHMARK_PARSE_JSON: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
@@ -173,6 +173,38 @@ def BENCHMARK_PARSE_JSON(list_macaroons_strings):
 ##########import macaroons_lib2 as mlib#################
 numberOfRuns = 1000
 BYTES_SIZE = 300
+print("-------------------------------------------------------------------------")
+print("------------------------BYTES IN PAYLOAD = "+str(BYTES_SIZE)+"---------------------------")
+print("-------------------------------------------------------------------------")
+
+result = BENCHMARK_HMAC_SHA_256(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
+(macaroons_, randomKey) = BENCHMARK_MINT_MACAROON(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
+macaroons_with_caveats_added = BENCHMARK_ADD_CAVEAT(macaroons_, caveats_to_copy=["chunk E 100 ... 500", "op E read, write", "time < 5/1/13 3pm"])
+macaroons_verified=BENCHMARK_VERIFY(macaroons_with_caveats_added, randomKey)
+macaroons_as_json_strings=BENCHMARK_MARSHALL_JSON(macaroons_verified)
+macaroons_back_as_objects=BENCHMARK_PARSE_JSON(macaroons_as_json_strings)
+
+
+
+BYTES_SIZE = 500
+print("-------------------------------------------------------------------------")
+print("------------------------BYTES IN PAYLOAD = "+str(BYTES_SIZE)+"---------------------------")
+print("-------------------------------------------------------------------------")
+
+result = BENCHMARK_HMAC_SHA_256(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
+(macaroons_, randomKey) = BENCHMARK_MINT_MACAROON(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
+macaroons_with_caveats_added = BENCHMARK_ADD_CAVEAT(macaroons_, caveats_to_copy=["chunk E 100 ... 500", "op E read, write", "time < 5/1/13 3pm"])
+macaroons_verified=BENCHMARK_VERIFY(macaroons_with_caveats_added, randomKey)
+macaroons_as_json_strings=BENCHMARK_MARSHALL_JSON(macaroons_verified)
+macaroons_back_as_objects=BENCHMARK_PARSE_JSON(macaroons_as_json_strings)
+
+
+
+
+BYTES_SIZE = 700
+print("-------------------------------------------------------------------------")
+print("------------------------BYTES IN PAYLOAD = "+str(BYTES_SIZE)+"---------------------------")
+print("-------------------------------------------------------------------------")
 
 result = BENCHMARK_HMAC_SHA_256(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 (macaroons_, randomKey) = BENCHMARK_MINT_MACAROON(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)

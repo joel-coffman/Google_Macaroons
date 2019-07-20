@@ -87,7 +87,7 @@ a= []
 def BENCHMARK_HMAC_SHA_256(numRuns, sizePayload, randomKeySizeBits=128):
     randomKey = generateStringOfBytes(int(randomKeySizeBits/8))
     payloads = generatePayloads(numRuns, sizePayload)
-    print("length of payloads is: ", len(payloads))
+    #print("length of payloads is: ", len(payloads))
     global a 
     a = copy.deepcopy(payloads)
     data_inputs = [[payload , randomKey] for payload in payloads]
@@ -143,6 +143,30 @@ def BENCHMARK_VERIFY(list_macaroons, randomKey):
     print("BENCHMARK_VERIFY: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
 
+def BENCHMARK_MARSHALL_JSON(list_macaroons):
+    numRuns = len(list_macaroons)
+    data_inputs = list_macaroons
+    (outputs, startTime, endTime) = timingModule(  mlib.marshalToJSON , data_inputs, numRuns = numRuns)
+    diff = (endTime - startTime+.0)/numRuns
+    print(startTime)
+    print(endTime)
+    diff = diff * 1000000.
+    print("BENCHMARK_MARSHALL_JSON: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
+    return outputs
+
+
+def BENCHMARK_PARSE_JSON(list_macaroons_strings):
+    numRuns = len(list_macaroons_strings)
+    data_inputs = list_macaroons_strings
+    (outputs, startTime, endTime) = timingModule(  mlib.parseFromJSON , data_inputs, numRuns = numRuns)
+    diff = (endTime - startTime+.0)/numRuns
+    print(startTime)
+    print(endTime)
+    diff = diff * 1000000.
+    print("BENCHMARK_PARSE_JSON: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
+    return outputs
+
+
 
 ###########################
 ### Experiment 1: 300 bytes
@@ -154,3 +178,5 @@ result = BENCHMARK_HMAC_SHA_256(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 (macaroons_, randomKey) = BENCHMARK_MINT_MACAROON(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 macaroons_with_caveats_added = BENCHMARK_ADD_CAVEAT(macaroons_, caveats_to_copy=["chunk E 100 ... 500", "op E read, write", "time < 5/1/13 3pm"])
 macaroons_verified=BENCHMARK_VERIFY(macaroons_with_caveats_added, randomKey)
+macaroons_as_json_strings=BENCHMARK_MARSHALL_JSON(macaroons_verified)
+macaroons_back_as_objects=BENCHMARK_PARSE_JSON(macaroons_as_json_strings)

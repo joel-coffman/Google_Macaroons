@@ -129,11 +129,13 @@ def convert_to_dict(mac_obj):
     return obj_dict
 
 def dict_to_obj(dictionary_obj):
-    print("---", str(dictionary_obj))
+    #print("---", str(dictionary_obj))
     caveatsList = dictionary_obj['caveats']
+    #print(type(caveatsList))
+    #print(caveatsList)
     macaroon_object = Macaroon(dictionary_obj["id"] , caveatsList , dictionary_obj['sig'] )
     macaroon_object.targetLocation = dictionary_obj["targetLocation"]
-    print(" in dict_to_obj = ", dictionary_obj["thirdPartyLocations"])
+    #print(" in dict_to_obj = ", dictionary_obj["thirdPartyLocations"])
     macaroon_object.thirdPartyLocations = dictionary_obj["thirdPartyLocations"]
     return macaroon_object
 

@@ -5,19 +5,83 @@ import time
 from Crypto.Cipher import AES
 import json 
 
+"""This is a library file for creating macaroons. The functions defined are only those
+necessary to duplicate the results in Table 2 of Birgisson et al.'s "Macaroons: Cookies
+with Contextual Caveats for Decentralized Authorization in the Cloud". 
+
+The definition of a macaroon (M) as defined by Birgisson et al. is a tuple of the form
+of macaroon@L(id,C,sig) where (per Figure 7)
+    * L - Locs (optional) is a hint to the target’s location
+    * id - BitStrs is the macaroon identifier
+    * C is a list of caveats of the form cav@cL(cId, vId), where
+        * cL 2 Locs (optional) is a hint to a discharge location
+        * cId 2 BitStrs is the caveat identifier
+        * vId 2 BitStrs is the verification-key identifier
+    * sig - Keys is a chained-MAC signature over the macaroon identifier id, as well as each of the caveats in C, in linear sequence.
+
+The macaroons functions from the paper's Figure 8 defined herein include the following: 
+	CreateMacaroon(key, id, location) = CreateMacaroon(k, id , L); 
+	... = M.addCaveatHelper(cId, vId, cL)
+	... = M.AddFirstPartyCaveat(a)
+	... = M.Verify(TM , k, A, M)
+The additional functions for marshalling and pasing JSONs are being also tested to support 
+the replication of results in Birgisson et al. Table II.
+	... = Mashal as JSON
+	... = Parse from JSON
+	
+...
+
+Test File Development Status
+-------
+    Completed: 
+        ...
+    To-do: 
+        ...
+        
+...
+
+Methods
+-------
+	CreateMacaroon(key, id, location)
+        Creates a macaroon
+    ENC(sig, key)
+        encrypts the signature with a secret key
+	verify(macaroon, K_TargetService ):
+        Verifies a macaroon and its caveats
+    ...
 """
-key: encryption key   
-id: random_nonce / payload
-"""
+
 def CreateMacaroon(key, id, location):
+    """Creates a macaroon
+    
+    Given a high-entropy root key k and an identifier id, the function CreateMacaroon(k,id) returns 
+    a macaroon that has the identifier id, an empty caveat list, and a valid signature sig = MAC(k, id ).
+    
+    Parameters
+	----------
+    key : str
+        encryption key   
+    id : str
+        random_nonce / payload
+    location : str
+        specified location
+    """
     data = hmac.new(key, id, hashlib.sha256)
     signature_str = data.hexdigest()  # KLUDGE: can we go back and forth from hexdigest()
     macaroon_obj = Macaroon( id , [], signature_str)
     macaroon_obj.targetLocation = location 
     return macaroon_obj
 
-
 def ENC(sig, key):
+    """encrypts the signature with a secret key
+    
+    Parameters
+	----------
+    sig : str
+        signaure to be encrypted   
+    key : str
+        secret key
+    """
     password = "12324211231"
     key = hashlib.sha256(password).digest() ## output is 16 bytes
     key = key[:16]
@@ -28,15 +92,29 @@ def ENC(sig, key):
     ciphertext = encryptor.encrypt(forEncryption)
     return 
 
-
+"""old code to delete?
+"""
 #KTS = dictionaryOfKeys[macaroon.id]
 #verify(myMacaroon, KTS)
 
-"""
-    Not the original "verify" in paper. 
-    This method only assumes that the Macaroon was created with first party caveats. 
-"""
 def verify(macaroon, K_TargetService ):
+    """Verifies a macaroon and its caveats
+
+    This function operates such that it can verify an incoming access request consisting of an 
+    authorizing macaroon TM so a target service can ensure that all first-party embedded caveats 
+    in TM are satisfied.
+
+    Note this function is not the original "verify" in paper. (Since Table 2 doesn't require 
+    third part caveats and verifying discharge macaroons). Thus this method only assumes 
+    that the Macaroon was created with first party caveats. 
+    
+    Parameters
+	----------
+    macaroon : macaroon class object
+        macaroon to be verified  
+    K_TargetService : str
+        key of target service
+    """
     #### verify the K_TargetService with Random_Nonce
     data = hmac.new(K_TargetService, macaroon.id, hashlib.sha256)
     signature_str = data.hexdigest() 

@@ -5,11 +5,12 @@ import base64
 import time
 from Crypto.Cipher import AES	
 
-"""This is test file used for testing each of the functions defined in macaroons_lib2
+"""This is a test file for testing each of the functions defined in macaroons_lib2
 
-The five functional tests are written to ensure the appliable macaroons function operate 
-as defined within the paper written by Birgisson et al. The macaroons functions from the 
-paper being tested include the following: 
+The five functional tests are written to ensure the appliable macaroons functions operate 
+as defined within the paper written by Birgisson et al.'s "Macaroons: Cookies with Contextual 
+Caveats for Decentralized Authorization in the Cloud". The macaroons functions from the 
+paper's Figure 8 (Page 7) being tested within this test file include the following: 
 	Test 2 - CreateMacaroon(k, id , L); 
 	Test 3 - M.addCaveatHelper(cId, vId, cL)
 	Test 4 - M.AddFirstPartyCaveat(a)
@@ -21,7 +22,7 @@ the replication of results in Birgisson et al. Table II.
 	
 ...
 
-Status
+Test File Development Status
 -------
 	as of 3pm 7/20
 		completed so far: 

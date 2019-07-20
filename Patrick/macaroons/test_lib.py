@@ -5,15 +5,30 @@ import base64
 import time
 from Crypto.Cipher import AES
 
+# In this test file, we will be testing each of the functions defined in macaroons_lib2 to ensure they are behaving as expected
+
 def printTestDesc(testName):
     print("------------------------------------------ ATTEMPTING "+ testName)
 
 def printTestResult(testName, string):
     print("------------------------------------------ "+ testName + ":"+ string )
 
+"""
+	completed so far as of 3pm 7/20: create macaroon, verift 1st party caveat
+	to do: add 1st party caveat, marshal and parse from json, conversion to dict and obj
+	not needed: 3rd party caveat since it is not in the table we are reproducing
+"""
 
 
-def testVerifyOfFirstPartyCaveats():
+"""
+        completed so far as of 420pm 7/20: create macaroon, verift 1st party caveat, add 1st party caveat, marshal and parse from json
+        to do: conversion to dict and obj (talk to Ali, may not need testing, since we pulled straight from online source)
+        not needed: 3rd party caveat since it is not in the table we are reproducing
+"""
+
+
+# this function verifies first party caveats
+def test1_VerifyOfFirstPartyCaveats():
     K_TargetService1 = "this is the secret key "
     K_TargetService2 = "this is also the secret key "
     random_nonce = str(433242342)
@@ -33,7 +48,9 @@ def testVerifyOfFirstPartyCaveats():
 """
     This function tests... 
 """
-def test1_CreateMacaroon():
+
+# this function creates a simple macaroon
+def test2_CreateMacaroon():
     #### Input: data 
     id = "abc"
     key = "234324"
@@ -54,7 +71,7 @@ def test1_CreateMacaroon():
 """
     This function tests... addCaveatHelper
 """
-def test2_addCaveatHelper():
+def test3_addCaveatHelper():
     printTestDesc("addCaveatHelper")
     id = "abc"
     key = "234324"
@@ -80,21 +97,45 @@ def test2_addCaveatHelper():
 """
     This function tests... addFirstPartyCaveat  --> this function wraps add caveat helper
 """
-def test2_addFirstPartyCaveat():
-    id = ""
-    key = ""
-    location = ""
-    macaroon = mlib.createMacaroon()
+def test4_addFirstPartyCaveat():
+    printTestDesc("addFirstPartyCaveat")
+    id = "abc"
+    key = "234324"
+    location = "DC"
+    M = mlib.CreateMacaroon(key, id, location)
+    caveat_cid = "123"
+    caveat_vid = "0"
+    caveat_cl = "NYC"
+    M.addCaveatHelper(caveat_cid , caveat_vid,  caveat_cl)
+    assert(M.sig != oldMacaroonCopy.sig)
+    #### what to verify
+    #### test if the caveat was properly added
+    string_caveat = caveat_cid + ":" + caveat_vid + ":" + caveat_cl
+    assert(M.caveats[-1] == string_caveat)
+    #### test if the caveat signature "evolved" correctly
+    new_sig = hmac.new(oldMacaroonCopy.sig, caveat_vid+caveat_cid , hashlib.sha256)
+    assert(M.sig == new_sig.hexdigest())
+    printTestResult("addFirstPartyCaveat" , "SUCCESS")
 
-
-
+def test5_marshalAndParseJSON():
+    printTestDesc("marshalToJSON")
+    id = "abc"
+    key = "234324"
+    location = "DC"
+    M = mlib.CreateMacaroon(key, id, location)
+    json_string = marshalToJSON(M)
+    print(json_string)
+    printTestDesc("parseToJSON")
+    M_returned = parseFromJSON(json_string)
+    print(M_returned)
 
 
 if(__name__ == "__main__"):
-    test1_CreateMacaroon()
-    test2_addCaveatHelper()
-    #testVerify()
-
+    test1_VerifyOfFirstPartyCaveats()
+    test2_CreateMacaroon()
+    test3_addCaveatHelper()
+    test4_addFirstPartyCaveat()
+    test5_marshalAndParseJSON()
 
 
 
@@ -113,4 +154,3 @@ if(__name__ == "__main__"):
 # M.thirdPartyLocations = ["NYC" , "DC", "Baltimore"]
 # json_string2 = marshalToJSON(M)
 # M_returned2 = parseFromJSON(json_string2)
-

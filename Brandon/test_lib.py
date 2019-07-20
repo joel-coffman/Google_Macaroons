@@ -7,7 +7,7 @@ import time
 from Crypto.Cipher import AES
 
 
-
+#this is how to edit in the GUI
 
 def testVerifyOfFirstPartyCaveats():
     K_TargetService1 = "this is the secret key "

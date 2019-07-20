@@ -22,7 +22,7 @@ def printTestResult(testName, string):
 
 """
         completed so far as of 420pm 7/20: create macaroon, verift 1st party caveat, add 1st party caveat, marshal and parse from json
-        to do: conversion to dict and obj
+        to do: conversion to dict and obj (talk to Ali, may not need testing, since we pulled straight from online source)
         not needed: 3rd party caveat since it is not in the table we are reproducing
 """
 

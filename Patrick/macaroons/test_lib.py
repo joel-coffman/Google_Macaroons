@@ -1,34 +1,95 @@
-import macaroons_lib2 as mlib
+import macaroons_lib2 as mlib	# library of macroons being tested
 import hmac
 import hashlib
 import base64
 import time
-from Crypto.Cipher import AES
+from Crypto.Cipher import AES	
 
-# In this test file, we will be testing each of the functions defined in macaroons_lib2 to ensure they are behaving as expected
+"""This is test file used for testing each of the functions defined in macaroons_lib2
+
+The five functional tests are written to ensure the appliable macaroons function operate 
+as defined within the paper written by Birgisson et al. The macaroons functions from the 
+paper being tested include the following: 
+	Test 2 - CreateMacaroon(k, id , L); 
+	Test 3 - M.addCaveatHelper(cId, vId, cL)
+	Test 4 - M.AddFirstPartyCaveat(a)
+	Test 1 - M.Verify(TM , k, A, M)
+The additional functions for marshalling and pasing JSONs are being also tested to support 
+the replication of results in Birgisson et al. Table II.
+	Test 5 - Mashal as JSON
+	Test 5 - Parse from JSON
+	
+...
+
+Status
+-------
+	as of 3pm 7/20
+		completed so far: 
+			create macaroon
+			verify 1st party caveat
+		to do: 
+			add 1st party caveat
+			marshal and parse from json
+			conversion to dict and obj
+		not needed: 3rd party caveat since it is not in the table we are reproducing
+
+        as of 420pm 7/20
+		completed so far: 
+			create macaroon, 
+			verify 1st party caveat, 
+			add 1st party caveat, 
+			marshal and parse from json
+        	to do: 
+			conversion to dict and obj 
+				(talk to Ali, may not need testing, since we pulled straight from online source)
+       		not needed: 
+			3rd party caveat since it is not in the table we are reproducing
+
+...
+
+Methods
+-------
+	printTestDesc(testName)
+		Prints the tests name (i.e. testName) that is being attempted 
+	printTestResult(testName, string)
+		Prints the test name and its reuslts (i.e. testName and string) following test completion 
+	test1_VerifyOfFirstPartyCaveats()
+		Test 1 creates a macaroon and add first party caveats then tests the verify function
+	test2_CreateMacaroon()
+		Test 2 creates a simple macaroon and tests its creation
+	test3_addCaveatHelper():
+		Test 3 creates a simple macaroon and tests the caveat helper function
+	test4_addFirstPartyCaveat():
+		Test 4 tests add First Party Caveat function which is a function wrapper of addCaveatHelper
+	test5_marshalAndParseJSON():
+		Test 5 creates a macaroon and tests the marshal and parse to JSON functions
+"""
 
 def printTestDesc(testName):
+	"""Prints the tests name (i.e. testName) that is being attempted 
+	
+	Parameters
+	----------
+	testName : str
+		The name of the test being run
+	"""
     print("------------------------------------------ ATTEMPTING "+ testName)
 
 def printTestResult(testName, string):
+	"""Prints the test name and its reuslts (i.e. testName and string) following test completion 
+	
+	Parameters
+	----------
+	testName : str
+		The name of the test being run
+	testName : str
+		The results of the test
+	"""
     print("------------------------------------------ "+ testName + ":"+ string )
 
-"""
-	completed so far as of 3pm 7/20: create macaroon, verift 1st party caveat
-	to do: add 1st party caveat, marshal and parse from json, conversion to dict and obj
-	not needed: 3rd party caveat since it is not in the table we are reproducing
-"""
-
-
-"""
-        completed so far as of 420pm 7/20: create macaroon, verift 1st party caveat, add 1st party caveat, marshal and parse from json
-        to do: conversion to dict and obj (talk to Ali, may not need testing, since we pulled straight from online source)
-        not needed: 3rd party caveat since it is not in the table we are reproducing
-"""
-
-
-# this function verifies first party caveats
 def test1_VerifyOfFirstPartyCaveats():
+	"""Test 1 creates a macaroon and add first party caveats then tests the verify function
+	"""
     K_TargetService1 = "this is the secret key "
     K_TargetService2 = "this is also the secret key "
     random_nonce = str(433242342)
@@ -45,12 +106,9 @@ def test1_VerifyOfFirstPartyCaveats():
     assert(mlib.verify(receivedMacaroon, K_TargetService2 ) == False)
     assert(mlib.verify(receivedMacaroon, K_TargetService1 ) == True)
 
-"""
-    This function tests... 
-"""
-
-# this function creates a simple macaroon
 def test2_CreateMacaroon():
+	"""Test 2 creates a simple macaroon and tests its creation
+	"""
     #### Input: data 
     id = "abc"
     key = "234324"
@@ -68,10 +126,9 @@ def test2_CreateMacaroon():
     assert(M.id == id)
     printTestResult("CreateMacaroon" , "SUCCESS")
 
-"""
-    This function tests... addCaveatHelper
-"""
 def test3_addCaveatHelper():
+	"""Test 3 creates a simple macaroon and tests the caveat helper function
+	"""
     printTestDesc("addCaveatHelper")
     id = "abc"
     key = "234324"
@@ -94,10 +151,9 @@ def test3_addCaveatHelper():
     assert(M.sig == new_sig.hexdigest())
     printTestResult("addCaveatHelper" , "SUCCESS")
 
-"""
-    This function tests... addFirstPartyCaveat  --> this function wraps add caveat helper
-"""
 def test4_addFirstPartyCaveat():
+	"""Test 4 tests add First Party Caveat function which is a function wrapper of addCaveatHelper
+	"""
     printTestDesc("addFirstPartyCaveat")
     id = "abc"
     key = "234324"
@@ -118,6 +174,8 @@ def test4_addFirstPartyCaveat():
     printTestResult("addFirstPartyCaveat" , "SUCCESS")
 
 def test5_marshalAndParseJSON():
+	"""Test 5 creates a macaroon and tests the marshal and parse to JSON functions
+	"""
     printTestDesc("marshalToJSON")
     id = "abc"
     key = "234324"
@@ -129,17 +187,16 @@ def test5_marshalAndParseJSON():
     M_returned = parseFromJSON(json_string)
     print(M_returned)
 
-
 if(__name__ == "__main__"):
+	#  call all five tests
     test1_VerifyOfFirstPartyCaveats()
     test2_CreateMacaroon()
     test3_addCaveatHelper()
     test4_addFirstPartyCaveat()
     test5_marshalAndParseJSON()
 
-
-
-
+"""old code
+"""
 # id = "abc"
 # key = "234324"
 # location = "DC"
@@ -150,7 +207,8 @@ if(__name__ == "__main__"):
 # json_string = marshalToJSON(M)
 # M_returned = parseFromJSON(json_string)
 
-
+"""old code
+"""
 # M.thirdPartyLocations = ["NYC" , "DC", "Baltimore"]
 # json_string2 = marshalToJSON(M)
 # M_returned2 = parseFromJSON(json_string2)

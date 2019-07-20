@@ -64,11 +64,17 @@ def mint_macaroon(arr):
     location = arr[2]
     #### use library to compute HMAC
     M = mlib.CreateMacaroon(private_key, public_id, location)
-    M.addFirstPartyCaveat("chunk E 100 ... 500")
-    M.addFirstPartyCaveat("op E read, write")
-    M.addFirstPartyCaveat("time < 5/1/13 3pm")
+    #M.addFirstPartyCaveat("chunk E 100 ... 500")
+    #M.addFirstPartyCaveat("op E read, write")
+    #M.addFirstPartyCaveat("time < 5/1/13 3pm")
     return M
 
+def add_caveat(arr):
+    macaroon= arr[0] 
+    caveat_strings = arr[1]
+    for caveat_string in caveat_strings:
+        macaroon.addFirstPartyCaveat(caveat_string)
+    return macaroon
 
 a= []
 
@@ -100,6 +106,25 @@ def BENCHMARK_MINT_MACAROON(numRuns, sizePayload , randomKeySizeBits=128):
     print("BENCHMARK_MINT_MACAROON: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
 
+"""
+caveats_to_copy is a list of strings, so you could have caveats_to_copy =[string1, string2, string3]
+"""
+def BENCHMARK_ADD_CAVEAT(list_macaroons, caveats_to_copy):
+    numRuns = len(list_macaroons)
+    list_caveats  = [copy.deepcopy(caveats_to_copy) for x in range(numRuns)]
+    data_inputs = []
+    for index in range(numRuns):
+        data_inputs.append([list_macaroons[index], list_caveats[index]])
+    (outputs, startTime, endTime) = timingModule(add_caveat, data_inputs, numRuns = numRuns)
+    diff = (endTime - startTime+.0)/numRuns
+    print(startTime)
+    print(endTime)
+    diff = diff * 1000000.
+    print("BENCHMARK_ADD_CAVEAT: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
+    return outputs
+
+
+
 ###########################
 ### Experiment 1: 300 bytes
 ##########import macaroons_lib2 as mlib#################
@@ -107,5 +132,5 @@ numberOfRuns = 1000
 BYTES_SIZE = 300
 
 result = BENCHMARK_HMAC_SHA_256(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
-
-result = BENCHMARK_MINT_MACAROON(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
+macaroons_ = BENCHMARK_MINT_MACAROON(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
+macaroons_with_caveats_added = BENCHMARK_ADD_CAVEAT(macaroons_, caveats_to_copy=["chunk E 100 ... 500", "op E read, write", "time < 5/1/13 3pm"])

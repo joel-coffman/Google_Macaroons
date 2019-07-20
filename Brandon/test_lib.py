@@ -19,6 +19,14 @@ def printTestResult(testName, string):
 	not needed: 3rd party caveat since it is not in the table we are reproducing
 """
 
+
+"""
+        completed so far as of 420pm 7/20: create macaroon, verift 1st party caveat, add 1st party caveat, marshal and parse from json
+        to do: conversion to dict and obj
+        not needed: 3rd party caveat since it is not in the table we are reproducing
+"""
+
+
 # this function verifies first party caveats
 def test1_VerifyOfFirstPartyCaveats():
     K_TargetService1 = "this is the secret key "

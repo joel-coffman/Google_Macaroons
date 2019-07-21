@@ -1,19 +1,21 @@
 # different hashlib,  different python version, 
-import numpy as np
+#C:/Users/User/Anaconda3_7/python.exe macaroons_benchmark_37.py
 import string
 import time 
 import hmac
 import hashlib
 import base64
-import macaroons_lib2 as mlib
+import macaroons_lib2_37 as mlib
 import copy
+import random
+import math
 ##########
-##########
+########## C:/Users/User/Anaconda3_7/python.exe
 ##########
 # variables
 
 # https://pynative.com/python-generate-random-string/
-alphabet = [x for x in string.lowercase]
+alphabet = [x for x in 'abcdefghijklmnopqrstuvwxyz']
 allAlphabet = alphabet + [x.upper() for x in alphabet]
 
 
@@ -30,7 +32,8 @@ def utf8len(s):
 def generateStringOfBytes(length):
     result = ''
     while(utf8len(result) != length):
-        result+=np.random.choice(allAlphabet)
+        index = int(math.floor(len(allAlphabet)*random.random()))
+        result+=allAlphabet[index]#np.random.choice(allAlphabet)
     return result
 
 
@@ -45,16 +48,16 @@ def hmac_sha_256(arr):
     #print("len arr, ", len(arr))
     #print(key)
     #print(payload)
-    hexVal =  hmac.new(key, payload , hashlib.sha256).hexdigest()
+    hexVal =  hmac.new(str(key).encode('utf-8'), str(payload).encode('utf-8') , hashlib.sha256).hexdigest()
     #print('here', hexVal)
     return hexVal
 
 def timingModule(func, inputs ,numRuns =10000):
-    startTime = time.time()
+    startTime = (time.time_ns()+.0)/(1e9)
     outputs = []
     for i in range(numRuns):
         outputs.append(func(inputs[i]))
-    endTime = time.time()
+    endTime = (time.time_ns()+.0)/(1e9)
     return (outputs, startTime, endTime)
 #### Generate 300 , 500, and  700 bytes of data 
 

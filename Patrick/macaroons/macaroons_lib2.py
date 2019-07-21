@@ -42,9 +42,10 @@ Test File Development Status
 
 Methods
 -------
+	
 	CreateMacaroon(key, id, location)
         Creates a macaroon
-    ENC(sig, key)
+        ENC(sig, key)
         encrypts the signature with a secret key
 	verify(macaroon, K_TargetService ):
         Verifies a macaroon and its caveats

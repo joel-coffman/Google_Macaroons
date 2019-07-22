@@ -85,8 +85,28 @@ def verify_macaroon(arr):
     assert(mlib.verify(macaroon, K_TargetService ) == True)
     return macaroon
 
-a= []
+def calculate_AES(arr):
+    sig = arr[0]
+    key = arr[1]
+    ciphertext = mlib.ENC2(sig, key)
+    return ciphertext
 
+def BENCHMARK_AES_128(numRuns, sizePayload, randomKeySizeBits=128):
+    randomKey = generateStringOfBytes(int(randomKeySizeBits/8))
+    payloads = generatePayloads(numRuns, sizePayload)
+    #print("length of payloads is: ", len(payloads))
+    data_inputs = [[payload , randomKey] for payload in payloads]
+    (outputs, startTime, endTime) = timingModule(calculate_AES,data_inputs, numRuns = numRuns)
+    diff = (endTime - startTime+.0)/numRuns
+    #print(startTime)
+    #print(endTime)
+    diff = diff * 1000000.
+    print("BENCHMARK_AES_256: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
+    return outputs
+
+
+
+a= []
 def BENCHMARK_HMAC_SHA_256(numRuns, sizePayload, randomKeySizeBits=128):
     randomKey = generateStringOfBytes(int(randomKeySizeBits/8))
     payloads = generatePayloads(numRuns, sizePayload)
@@ -171,6 +191,7 @@ def BENCHMARK_PARSE_JSON(list_macaroons_strings):
 
 
 
+
 ###########################
 ### Experiment 1: 300 bytes
 ##########import macaroons_lib2 as mlib#################
@@ -180,6 +201,8 @@ print("-------------------------------------------------------------------------
 print("------------------------BYTES IN PAYLOAD = "+str(BYTES_SIZE)+"---------------------------")
 print("-------------------------------------------------------------------------")
 
+
+resulta = BENCHMARK_AES_128(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 result = BENCHMARK_HMAC_SHA_256(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 (macaroons_, randomKey) = BENCHMARK_MINT_MACAROON(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 macaroons_with_caveats_added = BENCHMARK_ADD_CAVEAT(macaroons_, caveats_to_copy=["chunk E 100 ... 500", "op E read, write", "time < 5/1/13 3pm"])
@@ -194,6 +217,7 @@ print("-------------------------------------------------------------------------
 print("------------------------BYTES IN PAYLOAD = "+str(BYTES_SIZE)+"---------------------------")
 print("-------------------------------------------------------------------------")
 
+resulta = BENCHMARK_AES_128(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 result = BENCHMARK_HMAC_SHA_256(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 (macaroons_, randomKey) = BENCHMARK_MINT_MACAROON(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 macaroons_with_caveats_added = BENCHMARK_ADD_CAVEAT(macaroons_, caveats_to_copy=["chunk E 100 ... 500", "op E read, write", "time < 5/1/13 3pm"])
@@ -209,6 +233,7 @@ print("-------------------------------------------------------------------------
 print("------------------------BYTES IN PAYLOAD = "+str(BYTES_SIZE)+"---------------------------")
 print("-------------------------------------------------------------------------")
 
+resulta = BENCHMARK_AES_128(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 result = BENCHMARK_HMAC_SHA_256(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 (macaroons_, randomKey) = BENCHMARK_MINT_MACAROON(numberOfRuns, BYTES_SIZE, randomKeySizeBits=128)
 macaroons_with_caveats_added = BENCHMARK_ADD_CAVEAT(macaroons_, caveats_to_copy=["chunk E 100 ... 500", "op E read, write", "time < 5/1/13 3pm"])

@@ -5,15 +5,17 @@ import time
 import hmac
 import hashlib
 import base64
-import macaroons_lib2 as mlib
+import macaroons_lib2_27 as mlib
 import copy
+import random
+import math
 ##########
-##########
+########## C:/Users/User/Anaconda3_7/python.exe
 ##########
 # variables
 
 # https://pynative.com/python-generate-random-string/
-alphabet = [x for x in string.lowercase]
+alphabet = [x for x in 'abcdefghijklmnopqrstuvwxyz']
 allAlphabet = alphabet + [x.upper() for x in alphabet]
 
 
@@ -30,6 +32,7 @@ def utf8len(s):
 def generateStringOfBytes(length):
     result = ''
     while(utf8len(result) != length):
+        #index = int(math.floor(len(allAlphabet)*random.random()))
         result+=np.random.choice(allAlphabet)
     return result
 

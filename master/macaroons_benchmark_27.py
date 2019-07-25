@@ -129,6 +129,8 @@ def BENCHMARK_AES_128(numRuns, sizePayload, randomKeySizeBits=128):
     #print(startTime)
     #print(endTime)
     diff = diff * 1000000.
+    global results_data
+    results_data.append(diff)
     print("BENCHMARK_AES_128: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
 

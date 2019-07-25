@@ -103,7 +103,7 @@ def extendPayload(data):
 
 a= []
 
-
+results_data = []
 
 def BENCHMARK_AES_128(numRuns, sizePayload, randomKeySizeBits=128):
     randomKey = generateStringOfBytes(int(randomKeySizeBits/8))
@@ -116,6 +116,8 @@ def BENCHMARK_AES_128(numRuns, sizePayload, randomKeySizeBits=128):
     #print(startTime)
     #print(endTime)
     diff = diff * 1000000.
+    global results_data
+    results_data.append(diff)
     print("BENCHMARK_AES_128: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
 
@@ -132,6 +134,8 @@ def BENCHMARK_HMAC_SHA_256(numRuns, sizePayload, randomKeySizeBits=128):
     #print(startTime)
     #print(endTime)
     diff = diff * 1000000.
+    global results_data
+    results_data.append(diff)
     print("BENCHMARK_HMAC_SHA_256: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
 
@@ -145,6 +149,8 @@ def BENCHMARK_MINT_MACAROON(numRuns, sizePayload , randomKeySizeBits=128):
     #print(startTime)
     #print(endTime)
     diff = diff * 1000000.
+    global results_data
+    results_data.append(diff)
     print("BENCHMARK_MINT_MACAROON: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs, randomKey
 
@@ -162,6 +168,8 @@ def BENCHMARK_ADD_CAVEAT(list_macaroons, caveats_to_copy):
     #print(startTime)
     #print(endTime)
     diff = diff * 1000000.
+    global results_data
+    results_data.append(diff)
     print("BENCHMARK_ADD_CAVEAT: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
 
@@ -176,6 +184,8 @@ def BENCHMARK_VERIFY(list_macaroons, randomKey):
     #print(startTime)
     #print(endTime)
     diff = diff * 1000000.
+    global results_data
+    results_data.append(diff)
     print("BENCHMARK_VERIFY: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
 
@@ -187,6 +197,8 @@ def BENCHMARK_MARSHALL_JSON(list_macaroons):
     #print(startTime)
     #print(endTime)
     diff = diff * 1000000.
+    global results_data
+    results_data.append(diff)
     print("BENCHMARK_MARSHALL_JSON: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
 
@@ -199,6 +211,8 @@ def BENCHMARK_PARSE_JSON(list_macaroons_strings):
     #print(startTime)
     #print(endTime)
     diff = diff * 1000000.
+    global results_data
+    results_data.append(diff)
     print("BENCHMARK_PARSE_JSON: The difference in time for ", numRuns , "numRuns is ", diff , " microseconds")
     return outputs
 
@@ -220,8 +234,8 @@ macaroons_with_caveats_added = BENCHMARK_ADD_CAVEAT(macaroons_, caveats_to_copy=
 macaroons_verified=BENCHMARK_VERIFY(macaroons_with_caveats_added, randomKey)
 macaroons_as_json_strings=BENCHMARK_MARSHALL_JSON(macaroons_verified)
 macaroons_back_as_objects=BENCHMARK_PARSE_JSON(macaroons_as_json_strings)
-
-
+print(results_data)
+results_data = []
 
 BYTES_SIZE = 500
 print("-------------------------------------------------------------------------")
@@ -235,7 +249,8 @@ macaroons_with_caveats_added = BENCHMARK_ADD_CAVEAT(macaroons_, caveats_to_copy=
 macaroons_verified=BENCHMARK_VERIFY(macaroons_with_caveats_added, randomKey)
 macaroons_as_json_strings=BENCHMARK_MARSHALL_JSON(macaroons_verified)
 macaroons_back_as_objects=BENCHMARK_PARSE_JSON(macaroons_as_json_strings)
-
+print(results_data)
+results_data = []
 
 
 
@@ -251,3 +266,5 @@ macaroons_with_caveats_added = BENCHMARK_ADD_CAVEAT(macaroons_, caveats_to_copy=
 macaroons_verified=BENCHMARK_VERIFY(macaroons_with_caveats_added, randomKey)
 macaroons_as_json_strings=BENCHMARK_MARSHALL_JSON(macaroons_verified)
 macaroons_back_as_objects=BENCHMARK_PARSE_JSON(macaroons_as_json_strings)
+print(results_data)
+results_data = []

@@ -108,6 +108,50 @@ def ENC2(data, key):
     #https://cryptography.io/en/latest/hazmat/primitives/symmetric-encryption/?highlight=aes#cryptography.hazmat.primitives.ciphers.Cipher
     return ct 
 
+
+def ENC3(data, key):
+    import os 
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+    from cryptography.hazmat.backends import default_backend
+    backend = default_backend()
+    key = os.urandom(32)
+    iv = os.urandom(16)
+        #https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_Codebook_(ECB)
+        #https://cryptography.io/en/latest/hazmat/primitives/symmetric-encryption/?highlight=aes#cryptography.hazmat.primitives.ciphers.Cipher
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=backend)
+    encryptor = cipher.encryptor()
+    #print(data)
+    #print(len_data)
+        #print(len(data), " is ")
+    ct = encryptor.update(bytearray(data)) + encryptor.finalize()
+    #decryptor = cipher.decryptor()
+    #decryptor.update(ct) + decryptor.finalize()
+    #https://cryptography.io/en/latest/hazmat/primitives/symmetric-encryption/?highlight=aes#cryptography.hazmat.primitives.ciphers.Cipher
+    return ct 
+
+def ENC4(data, key):
+    # import os 
+    # from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+    # from cryptography.hazmat.backends import default_backend
+    cipher = AES.new(key, AES.MODE_ECB)
+    msg = cipher.encrypt(data)
+    #backend = default_backend()
+    #key = os.urandom(32)
+    #iv = os.urandom(16)
+        #https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_Codebook_(ECB)
+        #https://cryptography.io/en/latest/hazmat/primitives/symmetric-encryption/?highlight=aes#cryptography.hazmat.primitives.ciphers.Cipher
+    #cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=backend)
+    #encryptor = cipher.encryptor()
+    #print(data)
+    #print(len_data)
+        #print(len(data), " is ")
+    #ct = encryptor.update(bytearray(data)) + encryptor.finalize()
+    #decryptor = cipher.decryptor()
+    #decryptor.update(ct) + decryptor.finalize()
+    #https://cryptography.io/en/latest/hazmat/primitives/symmetric-encryption/?highlight=aes#cryptography.hazmat.primitives.ciphers.Cipher
+    return msg 
+
+
 def ENC(sig, key):
     """encrypts the signature with a secret key
     

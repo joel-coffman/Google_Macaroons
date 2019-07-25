@@ -99,6 +99,12 @@ def ENC(sig, key):
     ciphertext = encryptor.encrypt(forEncryption)
     return 
 
+def ENC4(data, key):
+    cipher = AES.new(key, AES.MODE_ECB)
+    msg = cipher.encrypt(data)
+    return msg 
+
+
 """old code to delete?
 """
 #KTS = dictionaryOfKeys[macaroon.id]

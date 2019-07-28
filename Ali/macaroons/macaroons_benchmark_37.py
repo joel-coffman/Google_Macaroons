@@ -221,7 +221,7 @@ def BENCHMARK_PARSE_JSON(list_macaroons_strings):
 ###########################
 ### Experiment 1: 300 bytes
 ##########import macaroons_lib2 as mlib#################
-numberOfRuns = 1000
+numberOfRuns = 5000
 BYTES_SIZE = 300
 print("-------------------------------------------------------------------------")
 print("------------------------BYTES IN PAYLOAD = "+str(BYTES_SIZE)+"---------------------------")
